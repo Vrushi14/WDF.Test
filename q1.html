@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <style>
+        body {
+            background-color: #3E5879;
+            font-family: cursive;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            text-align: center;
+        }
+
+        .board {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column {
+            background-color: #D8C4B6;
+            border-radius: 30px;
+            padding: 30px;
+            width: 30%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-right: 20px; 
+        }
+
+        .column:last-child {
+            margin-right: 0; 
+        }
+
+        .column:hover {
+            background-color: #e9ecef;
+        }
+
+        .tasks {
+            min-height: 200px;
+            margin-bottom: 10px;
+        }
+
+        .task {
+            background-color: #007bff;
+            color: white;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 3px;
+            cursor: move;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .task:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type='text'] {
+            width: calc(100% - 22px);
+            padding: 10px;
+        }
+
+        .add-btn {
+            background-color:#213555;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition:ease-in-out; 
+            transition: background-color 0.3s ease, transform 0.2s ease; 
+        }
+
+        .add-btn:hover {
+            background-color:#7197d4;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kanban Board</h1>
+        <div class="board">
+            <div class="column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h2>To Do</h2>
+                <div class="tasks"></div>
+                <input type="text" placeholder="Add new task..." id="newTaskInput">
+                <button class="add-btn" onclick="addTask('todo')">Add Task</button>
+            </div>
+            <div class="column" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h2>In Progress</h2>
+                <div class="tasks"></div>
+                <input type="text" placeholder="Add new task..." id="newTaskInputInProgress">
+                <button class="add-btn" onclick="addTask('inprogress')">Add Task</button>
+            </div>
+            <div class="column" id="validate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h2>Validate</h2>
+                <div class="tasks"></div>
+                <input type="text" placeholder="Add new task..." id="newTaskInputValidate">
+                <button class="add-btn" onclick="addTask('validate')">Add Task</button>
+            </div>
+            <div class="column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h2>Done</h2>
+                <div class="tasks"></div>
+                <input type="text" placeholder="Add new task..." id="newTaskInputDone">
+                <button class="add-btn" onclick="addTask('done')">Add Task</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            
+            const data = ev.dataTransfer.getData("text");
+            
+            const taskElement = document.getElementById(data);
+            
+            if (ev.target.classList.contains('tasks')) {
+                ev.target.appendChild(taskElement);
+                taskElement.style.opacity = '1'; 
+                taskElement.style.transform = 'translateY(0)'; 
+                taskElement.style.transition = "opacity 0.3s ease, transform 0.3s ease"; 
+                setTimeout(() => { taskElement.style.transition = ""; }, 300); 
+            }
+        }
+
+        function addTask(columnId) {
+            const inputField = document.querySelector(`#${columnId} input[type='text']`);
+            
+            if (inputField.value.trim() === '') return; 
+            
+            const task = document.createElement('div');
+            task.className = 'task';
+            task.setAttribute('draggable', 'true');
+            
+            
+            task.id = 'task-' + Date.now();
+            
+            task.textContent = inputField.value.trim();
+            
+             
+             task.addEventListener('dragstart', (e) => {
+                 e.dataTransfer.setData("text", task.id);
+                 setTimeout(() => { task.style.display = 'none'; }, 0); 
+             });
+
+             task.addEventListener('dragend', () => {
+                 setTimeout(() => { task.style.display = 'block'; }, 0);
+             });
+             
+             document.querySelector(`#${columnId} .tasks`).appendChild(task);
+             
+             
+             inputField.value = '';
+         }
+    </script>
+</body>
+</html>
